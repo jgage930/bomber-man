@@ -1,0 +1,2 @@
+1.  load player sprite and move with key board
+2.  Create a tile system for loading maps:
