@@ -64,6 +64,7 @@ fn create_map_system(
                     tile.insert(TileCollider);
                     tile.insert(Breakable);
 
+                    // spawn a floor tile under breakable walls
                     commands.spawn(SpriteBundle {
                         texture: game_textures.floor.clone(),
                         sprite: Sprite {
@@ -76,31 +77,10 @@ fn create_map_system(
                         },
                         ..Default::default()
                         },
-                );
+                    );
 
                 }
             }
         }
     }
-}
-
-fn spawn_tile_system(
-    mut commands: Commands,
-    game_textures: Res<GameTextures>,
-) {
-    commands.spawn(SpriteBundle {
-        texture: game_textures.wall.clone(),
-        sprite: Sprite {
-            custom_size: Some(Vec2::new(TILE_SIZE, TILE_SIZE)),
-            ..Default::default()
-        },
-        transform: Transform { 
-            translation: Vec3::new(400., 300., 100.), 
-            ..Default::default()
-        },
-        ..Default::default()
-        },
-    )
-    .insert(TileCollider);
-
 }

@@ -51,15 +51,16 @@ pub struct GameTextures {
 fn main() {
     App::new()
     .insert_resource(ClearColor(Color::rgb(0.04, 0.04, 0.04)))
-    .add_plugins(DefaultPlugins.set(WindowPlugin {
-        window: WindowDescriptor {
+    .add_plugins(DefaultPlugins
+        .set(WindowPlugin {
+            window: WindowDescriptor {
             title: "Bomber Man!".to_string(),
             width: 640.,
             height: 640.,
             ..Default::default()
         },
-        ..Default::default()
-    }))
+        ..Default::default() })
+        .set(ImagePlugin::default_nearest()))
     .add_plugin(PlayerPlugin)
     .add_plugin(TileMapPlugin)
     .add_startup_system(setup_system)

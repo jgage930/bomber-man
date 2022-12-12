@@ -65,7 +65,7 @@ fn player_spawn_system(
             ..Default::default()
         },
         transform: Transform {
-            translation: Vec3::new(400., -100., 10.),
+            translation: Vec3::new(400., 100., 10.),
             ..Default::default()
         },
         ..Default::default()
@@ -220,7 +220,7 @@ fn check_for_explosion_collision_system(
 
             let collision = collide(
                 explosion_translation, 
-                Vec2::splat(TILE_SIZE * 4.), 
+                Vec2::splat(TILE_SIZE * 2.5), 
                 wall_translation, 
                 Vec2::splat(TILE_SIZE) 
             );
