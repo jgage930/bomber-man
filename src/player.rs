@@ -11,12 +11,14 @@ use crate::{
 use bevy::prelude::*;
 use bevy::sprite::collide_aabb::collide;
 
+pub const STARTING_BOMB_COUNT: usize = 5;
 
 pub struct PlayerPlugin;
 
 #[derive(Component)]
 pub struct Player {
     speed: f32,
+    num_bombs: usize,
 }
 
 #[derive(Component)]
@@ -70,7 +72,7 @@ fn player_spawn_system(
         },
         ..Default::default()
     })
-    .insert(Player {speed: 6.0, });
+    .insert(Player {speed: 6.0, num_bombs: STARTING_BOMB_COUNT});
 }
 
 fn player_movement_system(
@@ -126,13 +128,16 @@ fn place_bomb_system(
     mut commands: Commands,
     game_textures: Res<GameTextures>,
     keyboard: Res<Input<KeyCode>>,
-    player_query: Query<&Transform, With<Player>>
+    player_query: Query<&Transform, With<Player>>,
+    mut player_component_query: Query<&mut Player>,
 ) {
     let player_transform = player_query.single();
+    
+    let mut player_component = player_component_query.single_mut();
 
     let (bomb_x, bomb_y) = (player_transform.translation.x, player_transform.translation.y);
 
-    if keyboard.just_pressed(KeyCode::Return) {
+    if keyboard.just_pressed(KeyCode::Return) && player_component.num_bombs > 0 {
         commands.spawn(SpriteBundle{
             texture: game_textures.bomb.clone(),    
             sprite: Sprite{
@@ -148,6 +153,8 @@ fn place_bomb_system(
         .insert(Bomb {
             timer: Timer::new(Duration::from_secs(BOMB_TIME), TimerMode::Once)
         });
+
+        player_component.num_bombs -= 1;
     }
 }
 
