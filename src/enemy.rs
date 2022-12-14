@@ -24,13 +24,13 @@ fn spawn_enemy_system(
     game_textures: Res<GameTextures>
 ) {
     commands.spawn(SpriteBundle {
-        texture: game_textures.orc.clone(),
+        texture: game_textures.bat.clone(),
         sprite: Sprite {
             custom_size: Some(Vec2::new(32.0, 64.0)),
             ..Default::default()
         },
         transform: Transform { 
-            translation: Vec3::new(100., 200., 10.), 
+            translation: Vec3::new(100., 200., 101.), 
             ..Default::default() 
         },
         ..Default::default()

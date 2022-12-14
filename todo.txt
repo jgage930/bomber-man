@@ -2,10 +2,15 @@ TODO:
 
 1.  Enemies
     - Move Towards Player DONE
-    - Collide With Walls DONE
     - Needs to damage player
     - Needs to be damages by bombs
     - Add to score when defeated
+    - Need a way to spawn multiple enemies
+
+2.  Bomb Pick Up
+    - Needs to spawn when tiles are broken
+    - player can pick them up and it adds one bomb to inventory
+    - 25% Chance to drop
 
 2.  Hud
     - Should display the following:

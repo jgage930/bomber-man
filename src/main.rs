@@ -19,7 +19,7 @@ const FLOOR_SPRITE: &str = "floor_tile.png";
 const BOMB_SPRITE: &str = "bomb.png";
 const EXPLOSION_SHEET: &str = "explo_a_sheet.png";
 const BREAKABLE_WALL_SPRITE: &str = "breakable_wall.png";
-const ORC_SPRITE: &str = "orc.png";
+const BAT_SPRITE: &str = "bat.png";
 
 const SPRITE_SCALE: f32 = 0.5;
 
@@ -47,7 +47,7 @@ pub struct GameTextures {
     bomb: Handle<Image>,
     explosion: Handle<TextureAtlas>,
     breakable_wall: Handle<Image>,
-    orc: Handle<Image>
+    bat: Handle<Image>
 }
 
 // End Resources
@@ -99,7 +99,7 @@ fn setup_system(
         bomb: assest_server.load(BOMB_SPRITE),
         explosion,
         breakable_wall: assest_server.load(BREAKABLE_WALL_SPRITE),
-        orc: assest_server.load(ORC_SPRITE),
+        bat: assest_server.load(BAT_SPRITE),
     };
 
     commands.insert_resource(game_textures);

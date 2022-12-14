@@ -116,7 +116,6 @@ fn player_movement_system(
     }
 
     player.position = Vec2::new(transform.translation.x, transform.translation.y);
-    println!("{} {}", player.position.x, player.position.y);
 }
 
 
