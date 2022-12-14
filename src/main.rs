@@ -3,10 +3,12 @@ use bevy::{prelude::*, sprite::collide_aabb::collide};
 use player::PlayerPlugin;
 use player::Player;
 use tilemap::{TileMapPlugin, TileCollider};
+use enemy::{EnemyPlugin, };
 
 mod player;
 mod components;
 mod tilemap;
+mod enemy;
 
 // Asset Constants
 const PLAYER_SPRITE: &str = "player.png";
@@ -17,6 +19,7 @@ const FLOOR_SPRITE: &str = "floor_tile.png";
 const BOMB_SPRITE: &str = "bomb.png";
 const EXPLOSION_SHEET: &str = "explo_a_sheet.png";
 const BREAKABLE_WALL_SPRITE: &str = "breakable_wall.png";
+const ORC_SPRITE: &str = "orc.png";
 
 const SPRITE_SCALE: f32 = 0.5;
 
@@ -44,6 +47,7 @@ pub struct GameTextures {
     bomb: Handle<Image>,
     explosion: Handle<TextureAtlas>,
     breakable_wall: Handle<Image>,
+    orc: Handle<Image>
 }
 
 // End Resources
@@ -63,6 +67,7 @@ fn main() {
         .set(ImagePlugin::default_nearest()))
     .add_plugin(PlayerPlugin)
     .add_plugin(TileMapPlugin)
+    .add_plugin(EnemyPlugin)
     .add_startup_system(setup_system)
     .run();
 }
@@ -94,6 +99,7 @@ fn setup_system(
         bomb: assest_server.load(BOMB_SPRITE),
         explosion,
         breakable_wall: assest_server.load(BREAKABLE_WALL_SPRITE),
+        orc: assest_server.load(ORC_SPRITE),
     };
 
     commands.insert_resource(game_textures);

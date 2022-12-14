@@ -1,2 +1,19 @@
-1.  load player sprite and move with key board
-2.  Create a tile system for loading maps:
+TODO:
+
+1.  Enemies
+    - Move Towards Player DONE
+    - Collide With Walls DONE
+    - Needs to damage player
+    - Needs to be damages by bombs
+    - Add to score when defeated
+
+2.  Hud
+    - Should display the following:
+        - player health
+        - number of bombs
+        - score
+
+3.  Levels
+    - Three unique Levels
+    
+4.  Sound

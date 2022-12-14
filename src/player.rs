@@ -19,6 +19,7 @@ pub struct PlayerPlugin;
 pub struct Player {
     speed: f32,
     num_bombs: usize,
+    pub position: Vec2,
 }
 
 #[derive(Component)]
@@ -72,16 +73,20 @@ fn player_spawn_system(
         },
         ..Default::default()
     })
-    .insert(Player {speed: 6.0, num_bombs: STARTING_BOMB_COUNT});
+    .insert(Player {
+        speed: 6.0, 
+        num_bombs: STARTING_BOMB_COUNT,
+        position: Vec2::new(400., 100.)
+    });
 }
 
 fn player_movement_system(
-    mut player_query: Query<(&Player, &mut Transform)>,
+    mut player_query: Query<(&mut Player, &mut Transform)>,
     wall_query: Query<&Transform, (With<TileCollider>, Without<Player>)>,
     keyboard: Res<Input<KeyCode>>,
     time: Res<Time>,
 ) {
-    let (player, mut transform) = player_query.single_mut();
+    let (mut player, mut transform) = player_query.single_mut();
 
     let mut y_delta = 0.0;
     if keyboard.pressed(KeyCode::W) {
@@ -109,6 +114,9 @@ fn player_movement_system(
     if wall_collision_check(target, &wall_query) {
         transform.translation = target;
     }
+
+    player.position = Vec2::new(transform.translation.x, transform.translation.y);
+    println!("{} {}", player.position.x, player.position.y);
 }
 
 
