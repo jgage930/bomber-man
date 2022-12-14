@@ -1,17 +1,19 @@
 use std::time::Duration;
 
-use crate::components::{Velocity, };
+use crate::enemy::Enemy;
 use crate::tilemap::{TileCollider, Breakable};
 use crate::{
     GameTextures,
-    SPRITE_SCALE, wall_collision_check, TIME_STEP, TILE_SIZE, BOMB_SPRITE,
+    TILE_SIZE,
     BOMB_TIME,
+    PLAYER_SIZE
 };
 
 use bevy::prelude::*;
 use bevy::sprite::collide_aabb::collide;
 
 pub const STARTING_BOMB_COUNT: usize = 5;
+pub const STARTING_HEALTH: f32 = 100.;
 
 pub struct PlayerPlugin;
 
@@ -20,6 +22,7 @@ pub struct Player {
     speed: f32,
     num_bombs: usize,
     pub position: Vec2,
+    health: f32
 }
 
 #[derive(Component)]
@@ -52,7 +55,8 @@ impl Plugin for PlayerPlugin {
         .add_system(camera_follow_system)
         .add_system(explosion_to_spawn_system)
         .add_system(explosion_animation_system)
-        .add_system(check_for_explosion_collision_system);
+        .add_system(check_for_explosion_collision_system)
+        .add_system(enemy_collision_check);
     }
 }
 
@@ -76,7 +80,8 @@ fn player_spawn_system(
     .insert(Player {
         speed: 6.0, 
         num_bombs: STARTING_BOMB_COUNT,
-        position: Vec2::new(400., 100.)
+        position: Vec2::new(400., 100.),
+        health: STARTING_HEALTH,
     });
 }
 
@@ -245,4 +250,43 @@ fn check_for_explosion_collision_system(
         }
     }
     
+}
+
+fn wall_collision_check(
+    target_player_pos: Vec3,
+    wall_query: &Query<&Transform, (With<TileCollider>, Without<Player>)>,
+) -> bool {
+    for wall_transform in wall_query.iter() {
+        let collision = collide(
+            target_player_pos,
+            Vec2::new(PLAYER_SIZE.0 * 0.7, PLAYER_SIZE.1 * 0.7),
+            wall_transform.translation,
+            Vec2::splat(TILE_SIZE),
+        );
+        if collision.is_some() {
+            return false;
+        }
+    }
+    true 
+}
+
+fn enemy_collision_check(
+    mut player_query: Query<(&Transform, &mut Player), With<Player>>,
+    enemy_query: Query<&Transform, With<Enemy>>,
+) {
+    let (player_transform, mut player) = player_query.single_mut();
+
+    for enemy_transform in enemy_query.iter() {
+        let collision = collide(
+            player_transform.translation,
+            Vec2::new(PLAYER_SIZE.0 * 0.7, PLAYER_SIZE.1 * 0.7),
+            enemy_transform.translation,
+            Vec2::new(PLAYER_SIZE.0 * 0.7, PLAYER_SIZE.1 * 0.7)
+        );
+
+        if collision.is_some() {
+            player.health -= 5.;
+            println!("health: {}", player.health);
+        }
+    }
 }
