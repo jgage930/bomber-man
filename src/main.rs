@@ -21,6 +21,8 @@ const EXPLOSION_SHEET: &str = "explo_a_sheet.png";
 const BREAKABLE_WALL_SPRITE: &str = "breakable_wall.png";
 const BAT_SPRITE: &str = "bat.png";
 
+const BACKGROUND_MUSIC: &str = "background-beat.ogg";
+
 const SPRITE_SCALE: f32 = 0.5;
 
 const TILE_SIZE: f32 = 64.0;
@@ -83,7 +85,7 @@ fn setup_system(
     assest_server: Res<AssetServer>,
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
     mut windows: ResMut<Windows>,
-
+    audio: Res<Audio>,
 ) {
     // create a camera
     commands.spawn(Camera2dBundle::default());
@@ -91,7 +93,6 @@ fn setup_system(
     // Define our window size
     let window = windows.get_primary_mut().unwrap();
     let (win_w, win_h) = (window.width(), window.height());
-    commands.insert_resource(WinSize {w: win_w, h: win_h});
 
     let explosion_handle = assest_server.load(EXPLOSION_SHEET); 
     let texture_atlast = TextureAtlas::from_grid(explosion_handle, Vec2::new(64., 64.), 4, 4, None, None);
@@ -112,4 +113,14 @@ fn setup_system(
     commands.insert_resource(MainState {
         score: 0,
     });
+
+    let music = assest_server.load(BACKGROUND_MUSIC);
+    audio.play_with_settings(
+        music,
+        PlaybackSettings {
+            repeat: true,
+            ..Default::default()
+        }
+    );
+    
 }
