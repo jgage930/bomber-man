@@ -60,7 +60,8 @@ impl Plugin for PlayerPlugin {
         .add_system(explosion_to_spawn_system)
         .add_system(explosion_animation_system)
         .add_system(check_for_explosion_collision_system)
-        .add_system(enemy_collision_check);
+        .add_system(enemy_collision_check)
+        .add_system(pickup_collision_check);
     }
 }
 
@@ -314,6 +315,28 @@ fn enemy_collision_check(
         if collision.is_some() {
             player.health -= 5.;
             println!("health: {}", player.health);
+        }
+    }
+}
+
+fn pickup_collision_check(
+    mut commands: Commands,
+    mut player_query: Query<(&Transform, &mut Player),  With<Player>>,
+    pickup_query: Query<(Entity, &Transform), With<BombPickup>>,
+) {
+    let (player_transform, mut player) = player_query.single_mut();
+
+    for (entity, pickup_transform) in pickup_query.iter() {
+        let collision = collide(
+            player_transform.translation,
+            Vec2::new(PLAYER_SIZE.0 * 0.7, PLAYER_SIZE.1 * 0.7),
+            pickup_transform.translation,
+            Vec2::new(TILE_SIZE, TILE_SIZE)
+        );
+
+        if collision.is_some() {
+            player.num_bombs += 1;
+            commands.entity(entity).despawn();
         }
     }
 }
