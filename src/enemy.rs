@@ -1,8 +1,9 @@
 use crate::{
-    GameTextures, TILE_SIZE, Player, player
+    GameTextures, TILE_SIZE, Player, player::{self, Explosion}, PLAYER_SIZE
 };
 
-use bevy::{prelude::*, transform};
+use bevy::{prelude::*, };
+use bevy::sprite::collide_aabb::collide;
 
 pub struct EnemyPlugin;
 
@@ -10,7 +11,8 @@ impl Plugin for EnemyPlugin {
     fn build(&self, app: &mut App) {
         app
             .add_startup_system_to_stage(StartupStage::PostStartup, spawn_enemy_system)
-            .add_system(enemy_movement_system);
+            .add_system(enemy_movement_system)
+            .add_system(check_for_explosion_collision);
     }
 }
 
@@ -59,5 +61,26 @@ fn enemy_movement_system(
 
         transform.translation.x += dx * enemy.speed * TILE_SIZE * time.delta_seconds();
         transform.translation.y += dy * enemy.speed * TILE_SIZE * time.delta_seconds();
+    }
+}
+
+fn check_for_explosion_collision(
+    mut commands: Commands,
+    explosion_query: Query<&Transform, With<Explosion>>,
+    enemy_query: Query<(Entity, &Transform), With<Enemy>>
+) {
+    for explosion_transform in explosion_query.iter() {
+        for (enemy_entity, enemy_transform) in enemy_query.iter() {
+            let collision = collide(
+                explosion_transform.translation,
+                Vec2::splat(TILE_SIZE * 2.5),
+                enemy_transform.translation,
+                Vec2::new(PLAYER_SIZE.0,PLAYER_SIZE.1)
+            );
+
+            if collision.is_some() {
+                commands.entity(enemy_entity).despawn();
+            }
+        }
     }
 }
