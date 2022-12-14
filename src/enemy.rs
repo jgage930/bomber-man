@@ -1,5 +1,5 @@
 use crate::{
-    GameTextures, TILE_SIZE, Player, player::{self, Explosion}, PLAYER_SIZE
+    GameTextures, TILE_SIZE, Player, player::{self, Explosion}, PLAYER_SIZE, MainState
 };
 
 use bevy::{prelude::*, };
@@ -67,7 +67,8 @@ fn enemy_movement_system(
 fn check_for_explosion_collision(
     mut commands: Commands,
     explosion_query: Query<&Transform, With<Explosion>>,
-    enemy_query: Query<(Entity, &Transform), With<Enemy>>
+    enemy_query: Query<(Entity, &Transform), With<Enemy>>,
+    mut main_state: ResMut<MainState>,
 ) {
     for explosion_transform in explosion_query.iter() {
         for (enemy_entity, enemy_transform) in enemy_query.iter() {
@@ -80,6 +81,8 @@ fn check_for_explosion_collision(
 
             if collision.is_some() {
                 commands.entity(enemy_entity).despawn();
+
+                main_state.score += 100;
             }
         }
     }

@@ -6,7 +6,7 @@ use crate::{
     GameTextures,
     TILE_SIZE,
     BOMB_TIME,
-    PLAYER_SIZE
+    PLAYER_SIZE, MainState
 };
 
 use bevy::prelude::*;
@@ -231,6 +231,7 @@ fn check_for_explosion_collision_system(
     mut commands: Commands,
     wall_query: Query<(Entity, &Transform), With<Breakable>>,
     explosion_query: Query<&Transform, With<Explosion>>,
+    mut main_state: ResMut<MainState>,
 ) {
     for (entity, wall_transform) in wall_query.iter() {
         for explosion_transform in explosion_query.iter() {
@@ -246,6 +247,8 @@ fn check_for_explosion_collision_system(
 
             if collision.is_some() {
                 commands.entity(entity).despawn();
+                
+                main_state.score += 10;
             }
         }
     }

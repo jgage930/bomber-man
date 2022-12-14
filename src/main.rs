@@ -50,6 +50,12 @@ pub struct GameTextures {
     bat: Handle<Image>
 }
 
+#[derive(Resource)]
+pub struct MainState {
+    // a container to hold all of the variables needed by the full game
+    score: usize,
+}
+
 // End Resources
 
 fn main() {
@@ -103,22 +109,7 @@ fn setup_system(
     };
 
     commands.insert_resource(game_textures);
-}
-
-fn wall_collision_check(
-    target_player_pos: Vec3,
-    wall_query: &Query<&Transform, (With<TileCollider>, Without<Player>)>,
-) -> bool {
-    for wall_transform in wall_query.iter() {
-        let collision = collide(
-            target_player_pos,
-            Vec2::new(PLAYER_SIZE.0 * 0.7, PLAYER_SIZE.1 * 0.7),
-            wall_transform.translation,
-            Vec2::splat(TILE_SIZE),
-        );
-        if collision.is_some() {
-            return false;
-        }
-    }
-    true 
+    commands.insert_resource(MainState {
+        score: 0,
+    });
 }

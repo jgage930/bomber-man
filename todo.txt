@@ -2,8 +2,8 @@ TODO:
 
 1.  Enemies
     - Move Towards Player DONE
-    - Needs to damage player
-    - Needs to be damages by bombs
+    - Needs to damage player DONE
+    - Needs to be damages by bombs DONE
     - Add to score when defeated
     - Need a way to spawn multiple enemies
 
