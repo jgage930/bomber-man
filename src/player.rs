@@ -1,4 +1,5 @@
 use std::time::Duration;
+use rand::Rng;
 
 use crate::enemy::Enemy;
 use crate::tilemap::{TileCollider, Breakable};
@@ -44,6 +45,9 @@ impl Default for ExplosionTimer {
         Self(Timer::from_seconds(0.05, TimerMode::Repeating))
     }
 }
+
+#[derive(Component)]
+pub struct BombPickup;
 
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
@@ -232,6 +236,7 @@ fn check_for_explosion_collision_system(
     wall_query: Query<(Entity, &Transform), With<Breakable>>,
     explosion_query: Query<&Transform, With<Explosion>>,
     mut main_state: ResMut<MainState>,
+    game_textures: Res<GameTextures>,
 ) {
     for (entity, wall_transform) in wall_query.iter() {
         for explosion_transform in explosion_query.iter() {
@@ -249,6 +254,25 @@ fn check_for_explosion_collision_system(
                 commands.entity(entity).despawn();
                 
                 main_state.score += 10;
+
+                // spawn a bomb pickup
+                let num = rand::thread_rng().gen_range(0..4);
+
+                if num == 0 {
+                    commands.spawn(SpriteBundle{
+                        texture: game_textures.bomb.clone(),    
+                        sprite: Sprite{
+                            custom_size: Some(Vec2::new(TILE_SIZE / 2., TILE_SIZE / 2.)),
+                            ..Default::default()
+                        },
+                        transform: Transform {
+                            translation: Vec3::new(wall_translation.x, wall_translation.y, 50.0),
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    })
+                    .insert(BombPickup);
+                }
             }
         }
     }
