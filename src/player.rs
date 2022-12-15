@@ -77,7 +77,7 @@ fn player_spawn_system(
             ..Default::default()
         },
         transform: Transform {
-            translation: Vec3::new(400., 100., 10.),
+            translation: Vec3::new(128., -96., 10.),
             ..Default::default()
         },
         ..Default::default()
@@ -307,9 +307,9 @@ fn enemy_collision_check(
     for enemy_transform in enemy_query.iter() {
         let collision = collide(
             player_transform.translation,
-            Vec2::new(PLAYER_SIZE.0 * 0.7, PLAYER_SIZE.1 * 0.7),
+            Vec2::new(20., 20.),
             enemy_transform.translation,
-            Vec2::new(PLAYER_SIZE.0 * 0.7, PLAYER_SIZE.1 * 0.7)
+            Vec2::new(20., 20.)
         );
 
         if collision.is_some() {

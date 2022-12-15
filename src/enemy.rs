@@ -25,21 +25,30 @@ fn spawn_enemy_system(
     mut commands: Commands,
     game_textures: Res<GameTextures>
 ) {
-    commands.spawn(SpriteBundle {
-        texture: game_textures.bat.clone(),
-        sprite: Sprite {
-            custom_size: Some(Vec2::new(32.0, 64.0)),
+    let enemy_positions = vec![
+        (100., 100.),
+        (200., 200.),
+        (300., 300.),
+        (100., -900.)
+    ];
+
+    for (x, y) in enemy_positions.iter() {
+        commands.spawn(SpriteBundle {
+            texture: game_textures.bat.clone(),
+            sprite: Sprite {
+                custom_size: Some(Vec2::new(32.0, 64.0)),
+                ..Default::default()
+            },
+            transform: Transform { 
+                translation: Vec3::new(*x, *y, 101.), 
+                ..Default::default() 
+            },
             ..Default::default()
-        },
-        transform: Transform { 
-            translation: Vec3::new(100., 200., 101.), 
-            ..Default::default() 
-        },
-        ..Default::default()
-    })
-    .insert(Enemy {
-        speed: 0.5,
-    });
+        })
+        .insert(Enemy {
+            speed: 0.8,
+        });
+    }
 }
 
 fn enemy_movement_system(
