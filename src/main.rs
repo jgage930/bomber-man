@@ -4,11 +4,13 @@ use player::PlayerPlugin;
 use player::Player;
 use tilemap::{TileMapPlugin, TileCollider};
 use enemy::{EnemyPlugin, };
+use hud::HudPlugin;
 
 mod player;
 mod components;
 mod tilemap;
 mod enemy;
+mod hud;
 
 // Asset Constants
 const PLAYER_SPRITE: &str = "player.png";
@@ -20,6 +22,7 @@ const BOMB_SPRITE: &str = "bomb.png";
 const EXPLOSION_SHEET: &str = "explo_a_sheet.png";
 const BREAKABLE_WALL_SPRITE: &str = "breakable_wall.png";
 const BAT_SPRITE: &str = "bat.png";
+const FONT: &str = "font.ttf";
 
 const BACKGROUND_MUSIC: &str = "background-beat.ogg";
 
@@ -49,13 +52,14 @@ pub struct GameTextures {
     bomb: Handle<Image>,
     explosion: Handle<TextureAtlas>,
     breakable_wall: Handle<Image>,
-    bat: Handle<Image>
+    bat: Handle<Image>,
+    font: Handle<Font>,
 }
 
 #[derive(Resource)]
 pub struct MainState {
     // a container to hold all of the variables needed by the full game
-    score: usize,
+    pub score: usize,
 }
 
 // End Resources
@@ -76,6 +80,7 @@ fn main() {
     .add_plugin(PlayerPlugin)
     .add_plugin(TileMapPlugin)
     .add_plugin(EnemyPlugin)
+    .add_plugin(HudPlugin)
     .add_startup_system(setup_system)
     .run();
 }
@@ -107,6 +112,7 @@ fn setup_system(
         explosion,
         breakable_wall: assest_server.load(BREAKABLE_WALL_SPRITE),
         bat: assest_server.load(BAT_SPRITE),
+        font: assest_server.load(FONT),
     };
 
     commands.insert_resource(game_textures);

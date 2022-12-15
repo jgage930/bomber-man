@@ -21,9 +21,9 @@ pub struct PlayerPlugin;
 #[derive(Component)]
 pub struct Player {
     speed: f32,
-    num_bombs: usize,
+    pub num_bombs: usize,
     pub position: Vec2,
-    health: f32
+    pub health: f32
 }
 
 #[derive(Component)]
