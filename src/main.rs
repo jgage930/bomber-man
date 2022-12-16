@@ -61,8 +61,14 @@ pub struct MainState {
     // a container to hold all of the variables needed by the full game
     pub score: usize,
 }
-
 // End Resources
+
+#[derive(Clone, PartialEq, Eq, Hash, Copy)]
+pub enum GameState {
+    StartMenu,
+    Game,
+    GameOver,
+}
 
 fn main() {
     App::new()
