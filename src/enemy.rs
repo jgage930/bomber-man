@@ -1,5 +1,5 @@
 use crate::{
-    GameTextures, TILE_SIZE, Player, player::{self, Explosion}, PLAYER_SIZE, MainState
+    GameTextures, TILE_SIZE, Player, player::{self, Explosion}, PLAYER_SIZE, MainState, GameState
 };
 
 use bevy::{prelude::*, };
@@ -10,9 +10,12 @@ pub struct EnemyPlugin;
 impl Plugin for EnemyPlugin {
     fn build(&self, app: &mut App) {
         app
-            .add_startup_system_to_stage(StartupStage::PostStartup, spawn_enemy_system)
-            .add_system(enemy_movement_system)
-            .add_system(check_for_explosion_collision);
+            .add_system_set(SystemSet::on_enter(GameState::Game).with_system(spawn_enemy_system))
+            .add_system_set(
+                SystemSet::on_update(GameState::Game)
+                    .with_system(enemy_movement_system)
+                    .with_system(check_for_explosion_collision)
+            );
     }
 }
 

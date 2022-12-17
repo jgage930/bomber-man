@@ -63,7 +63,7 @@ pub struct MainState {
 }
 // End Resources
 
-#[derive(Clone, PartialEq, Eq, Hash, Copy)]
+#[derive(Clone, PartialEq, Eq, Hash, Copy, Debug)]
 pub enum GameState {
     StartMenu,
     Game,
@@ -72,6 +72,7 @@ pub enum GameState {
 
 fn main() {
     App::new()
+    .add_state(GameState::StartMenu)
     .insert_resource(ClearColor(Color::rgb(0.04, 0.04, 0.04)))
     .add_plugins(DefaultPlugins
         .set(WindowPlugin {
@@ -88,6 +89,11 @@ fn main() {
     .add_plugin(EnemyPlugin)
     .add_plugin(HudPlugin)
     .add_startup_system(setup_system)
+    .add_system_set(SystemSet::on_enter(GameState::StartMenu).with_system(spawn_main_menu))
+    .add_system_set(
+        SystemSet::on_update(GameState::StartMenu)
+            .with_system(button_system)
+    )
     .run();
 }
 
@@ -134,5 +140,77 @@ fn setup_system(
             ..Default::default()
         }
     );
-    
+}
+
+
+const NORMAL_BUTTON: Color = Color::rgb(0.15, 0.15, 0.15);
+const HOVERED_BUTTON: Color = Color::rgb(0.25, 0.25, 0.25);
+const PRESSED_BUTTON: Color = Color::rgb(0.35, 0.75, 0.35);
+
+
+fn spawn_main_menu (
+    mut commands: Commands,
+    game_textures: Res<GameTextures>,
+) {
+    commands
+        .spawn(NodeBundle {
+            style: Style {
+                size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
+                align_items: AlignItems::Center,
+                justify_content: JustifyContent::Center,
+                ..default()
+            },
+            ..default()
+        })
+        .with_children(|parent| {
+            parent
+                .spawn(ButtonBundle {
+                    style: Style {
+                        size: Size::new(Val::Px(250.0), Val::Px(65.0)),
+                        // horizontally center child text
+                        justify_content: JustifyContent::Center,
+                        // vertically center child text
+                        align_items: AlignItems::Center,
+                        ..default()
+                    },
+                    background_color: NORMAL_BUTTON.into(),
+                    ..default()
+                })
+                .with_children(|parent| {
+                    parent.spawn(TextBundle::from_section(
+                        "Press To Start",
+                        TextStyle {
+                            font: game_textures.font.clone(),
+                            font_size: 40.0,
+                            color: Color::rgb(0.9, 0.9, 0.9),
+                        },
+                    ));
+                });
+        });
+}
+
+fn button_system(
+    mut interaction_query: Query<
+        (&Interaction, &mut BackgroundColor, &Children),
+        (Changed<Interaction>, With<Button>),
+    >,
+    mut text_query: Query<&mut Text>,
+) {
+    for (interaction, mut color, children) in &mut interaction_query {
+        let mut text = text_query.get_mut(children[0]).unwrap();
+        match *interaction {
+            Interaction::Clicked => {
+                text.sections[0].value = "Press to Start".to_string();
+                *color = PRESSED_BUTTON.into();
+            }
+            Interaction::Hovered => {
+                text.sections[0].value = "Press To Start".to_string();
+                *color = HOVERED_BUTTON.into();
+            }
+            Interaction::None => {
+                text.sections[0].value = "Press To Start".to_string();
+                *color = NORMAL_BUTTON.into();
+            }
+        }
+    }
 }

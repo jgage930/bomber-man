@@ -1,14 +1,17 @@
 use bevy::prelude::*;
 
-use crate::{GameTextures, player::Player, MainState};
+use crate::{GameTextures, player::Player, MainState, GameState};
 
 pub struct HudPlugin;
 
 impl Plugin for HudPlugin {
     fn build(&self, app: &mut App) {
         app
-            .add_startup_system_to_stage(StartupStage::PostStartup, spawn_hud)
-            .add_system(update_hud);
+            .add_system_set(SystemSet::on_enter(GameState::Game).with_system(spawn_hud))
+            .add_system_set(
+                SystemSet::on_update(GameState::Game)
+                    .with_system(update_hud)
+            );
     }
 }
 
