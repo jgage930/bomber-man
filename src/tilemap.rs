@@ -4,7 +4,7 @@ use std::{
 };
 use bevy::{prelude::*, };
 
-use crate::{GameTextures, TILE_SIZE, SPRITE_SCALE};
+use crate::{GameTextures, TILE_SIZE, GameState};
 
 pub struct TileMapPlugin;
 
@@ -20,7 +20,7 @@ pub struct Breakable;
 impl Plugin for TileMapPlugin {
     fn build(&self, app: &mut App) {
        app
-        .add_startup_system_to_stage(StartupStage::PostStartup, create_map_system); 
+        .add_system_set(SystemSet::on_enter(GameState::Game).with_system(create_map_system));
     }
 }
 

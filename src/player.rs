@@ -7,7 +7,8 @@ use crate::{
     GameTextures,
     TILE_SIZE,
     BOMB_TIME,
-    PLAYER_SIZE, MainState
+    PLAYER_SIZE, MainState,
+    GameState
 };
 
 use bevy::prelude::*;
@@ -52,16 +53,19 @@ pub struct BombPickup;
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
         app
-        .add_startup_system_to_stage(StartupStage::PostStartup, player_spawn_system)
-        .add_system(player_movement_system)
-        .add_system(place_bomb_system)
-        .add_system(explode_bomb_system)
-        .add_system(camera_follow_system)
-        .add_system(explosion_to_spawn_system)
-        .add_system(explosion_animation_system)
-        .add_system(check_for_explosion_collision_system)
-        .add_system(enemy_collision_check)
-        .add_system(pickup_collision_check);
+        .add_system_set(SystemSet::on_enter(GameState::Game).with_system(player_spawn_system))
+        .add_system_set(
+            SystemSet::on_update(GameState::Game)
+                .with_system(player_movement_system)
+                .with_system(place_bomb_system)
+                .with_system(explode_bomb_system)
+                .with_system(camera_follow_system)
+                .with_system(explosion_to_spawn_system)
+                .with_system(explosion_animation_system)
+                .with_system(check_for_explosion_collision_system)
+                .with_system(enemy_collision_check)
+                .with_system(pickup_collision_check)
+        );
     }
 }
 

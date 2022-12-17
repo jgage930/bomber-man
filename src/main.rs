@@ -61,11 +61,18 @@ pub struct MainState {
     // a container to hold all of the variables needed by the full game
     pub score: usize,
 }
-
 // End Resources
+
+#[derive(Clone, PartialEq, Eq, Hash, Copy, Debug)]
+pub enum GameState {
+    StartMenu,
+    Game,
+    GameOver,
+}
 
 fn main() {
     App::new()
+    .add_state(GameState::StartMenu)
     .insert_resource(ClearColor(Color::rgb(0.04, 0.04, 0.04)))
     .add_plugins(DefaultPlugins
         .set(WindowPlugin {
@@ -82,6 +89,12 @@ fn main() {
     .add_plugin(EnemyPlugin)
     .add_plugin(HudPlugin)
     .add_startup_system(setup_system)
+    .add_system_set(SystemSet::on_enter(GameState::StartMenu).with_system(spawn_main_menu))
+    .add_system_set(SystemSet::on_exit(GameState::StartMenu).with_system(hide_button))
+    .add_system_set(
+        SystemSet::on_update(GameState::StartMenu)
+            .with_system(button_system)
+    )
     .run();
 }
 
@@ -128,5 +141,97 @@ fn setup_system(
             ..Default::default()
         }
     );
-    
+}
+
+
+const NORMAL_BUTTON: Color = Color::rgb(0.15, 0.15, 0.15);
+const HOVERED_BUTTON: Color = Color::rgb(0.25, 0.25, 0.25);
+const PRESSED_BUTTON: Color = Color::rgb(0.35, 0.75, 0.35);
+
+
+fn spawn_main_menu (
+    mut commands: Commands,
+    game_textures: Res<GameTextures>,
+) {
+    commands
+        .spawn(NodeBundle {
+            style: Style {
+                size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
+                align_items: AlignItems::Center,
+                justify_content: JustifyContent::Center,
+                ..default()
+            },
+            ..default()
+        })
+        .with_children(|parent| {
+            parent
+                .spawn(ButtonBundle {
+                    style: Style {
+                        size: Size::new(Val::Px(250.0), Val::Px(65.0)),
+                        // horizontally center child text
+                        justify_content: JustifyContent::Center,
+                        // vertically center child text
+                        align_items: AlignItems::Center,
+                        ..default()
+                    },
+                    background_color: NORMAL_BUTTON.into(),
+                    ..default()
+                })
+                .with_children(|parent| {
+                    parent.spawn(TextBundle::from_section(
+                        "Press To Start",
+                        TextStyle {
+                            font: game_textures.font.clone(),
+                            font_size: 40.0,
+                            color: Color::rgb(0.9, 0.9, 0.9),
+                        },
+                    ));
+                });
+        });
+}
+
+fn button_system(
+    mut interaction_query: Query<
+        (&Interaction, &mut BackgroundColor, &Children),
+        (Changed<Interaction>, With<Button>),
+    >,
+    mut text_query: Query<&mut Text>,
+    mut game_state: ResMut<State<GameState>>
+) {
+    for (interaction, mut color, children) in &mut interaction_query {
+        let mut text = text_query.get_mut(children[0]).unwrap();
+        match *interaction {
+            Interaction::Clicked => {
+                text.sections[0].value = "Press to Start".to_string();
+                *color = PRESSED_BUTTON.into();
+                
+                game_state.set(GameState::Game).unwrap();
+            }
+            Interaction::Hovered => {
+                text.sections[0].value = "Press To Start".to_string();
+                *color = HOVERED_BUTTON.into();
+            }
+            Interaction::None => {
+                text.sections[0].value = "Press To Start".to_string();
+                *color = NORMAL_BUTTON.into();
+            }
+        }
+    }
+}
+
+fn hide_button(
+    mut button_query: Query<&mut Visibility, With<Button>>,
+    children_query: Query <&Children, With<Button>>,
+    mut child_visibility_query: Query<&mut Visibility, Without<Button>>
+) {
+    let mut button_vis = button_query.single_mut(); 
+    button_vis.is_visible = false;
+
+    if let Ok(children) = children_query.get_single() {
+       for child in children.iter() {
+            if let Ok(mut child_vis) = child_visibility_query.get_mut(*child) {
+                child_vis.is_visible = false;
+            }
+       } 
+    }
 }
