@@ -90,6 +90,7 @@ fn main() {
     .add_plugin(HudPlugin)
     .add_startup_system(setup_system)
     .add_system_set(SystemSet::on_enter(GameState::StartMenu).with_system(spawn_main_menu))
+    .add_system_set(SystemSet::on_exit(GameState::StartMenu).with_system(hide_button))
     .add_system_set(
         SystemSet::on_update(GameState::StartMenu)
             .with_system(button_system)
@@ -195,6 +196,7 @@ fn button_system(
         (Changed<Interaction>, With<Button>),
     >,
     mut text_query: Query<&mut Text>,
+    mut game_state: ResMut<State<GameState>>
 ) {
     for (interaction, mut color, children) in &mut interaction_query {
         let mut text = text_query.get_mut(children[0]).unwrap();
@@ -202,6 +204,8 @@ fn button_system(
             Interaction::Clicked => {
                 text.sections[0].value = "Press to Start".to_string();
                 *color = PRESSED_BUTTON.into();
+                
+                game_state.set(GameState::Game).unwrap();
             }
             Interaction::Hovered => {
                 text.sections[0].value = "Press To Start".to_string();
@@ -212,5 +216,22 @@ fn button_system(
                 *color = NORMAL_BUTTON.into();
             }
         }
+    }
+}
+
+fn hide_button(
+    mut button_query: Query<&mut Visibility, With<Button>>,
+    children_query: Query <&Children, With<Button>>,
+    mut child_visibility_query: Query<&mut Visibility, Without<Button>>
+) {
+    let mut button_vis = button_query.single_mut(); 
+    button_vis.is_visible = false;
+
+    if let Ok(children) = children_query.get_single() {
+       for child in children.iter() {
+            if let Ok(mut child_vis) = child_visibility_query.get_mut(*child) {
+                child_vis.is_visible = false;
+            }
+       } 
     }
 }
